@@ -104,8 +104,7 @@
         <span class="close" id="close-modal">&times;</span>
         <div id="modal-details"></div>
         <div class="share-options">
-            <button id="share-facebook">Share to Facebook</button>
-            <button id="share-twitter">Share to Twitter</button>
+            <button id="share-device">Share via Device</button>
         </div>
     </div>
 </div>
@@ -133,8 +132,7 @@
         const modalDetails = document.getElementById('modal-details');
         const closeModal = document.getElementById('close-modal');
         const searchInput = document.getElementById('search');
-        const shareFacebook = document.getElementById('share-facebook');
-        const shareTwitter = document.getElementById('share-twitter');
+        const shareDevice = document.getElementById('share-device');
 
         let currentElement = null;
 
@@ -166,6 +164,22 @@
             modal.style.display = 'none';
         }
 
+        function shareWithDevice() {
+            if (!navigator.share) {
+                alert('Sharing is not supported on this device.');
+                return;
+            }
+
+            const shareData = {
+                title: `Element: ${currentElement.Nama} (${currentElement.Simbol})`,
+                text: `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`,
+            };
+
+            navigator.share(shareData)
+                .then(() => console.log('Successfully shared'))
+                .catch((error) => console.error('Error sharing:', error));
+        }
+
         function updateTable(filteredElements) {
             tableContainer.innerHTML = '';
             filteredElements.forEach(element => {
@@ -175,15 +189,6 @@
                 div.onclick = () => showModal(element);
                 tableContainer.appendChild(div);
             });
-        }
-
-        function share(platform) {
-            const text = `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`;
-            if (platform === 'facebook') {
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(text)}`, '_blank');
-            } else if (platform === 'twitter') {
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-            }
         }
 
         searchInput.addEventListener('input', () => {
@@ -200,8 +205,7 @@
             if (event.target === modal) hideModal();
         });
 
-        shareFacebook.addEventListener('click', () => share('facebook'));
-        shareTwitter.addEventListener('click', () => share('twitter'));
+        shareDevice.addEventListener('click', shareWithDevice);
 
         updateTable(elements);
     }
