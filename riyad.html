@@ -40,16 +40,10 @@
             background-color: #99ccff;
         }
         .category-halogen {
-            background-color: #99ccff;
+            background-color: #66b3ff;
         }
         .category-noble-gas {
             background-color: #ccccff;
-        }
-        .category-lanthanide {
-            background-color: #ffccff;
-        }
-        .category-actinide {
-            background-color: #ff99cc;
         }
         .details {
             margin-top: 20px;
@@ -80,7 +74,7 @@
             const values = row.split(',');
             const element = {};
             headers.forEach((header, index) => {
-                element[header.trim()] = values[index].trim();
+                element[header.trim()] = values[index]?.trim() || '';
             });
             return element;
         });
@@ -92,29 +86,15 @@
         const detailsContainer = document.getElementById('details');
         const searchInput = document.getElementById('search');
 
-        function getCategoryClass(category) {
-            switch (category.toLowerCase()) {
-                case 'alkali':
-                    return 'category-alkali';
-                case 'alkaline earth':
-                    return 'category-alkaline-earth';
-                case 'transition':
-                    return 'category-transition';
-                case 'metalloid':
-                    return 'category-metalloid';
-                case 'nonmetal':
-                    return 'category-nonmetal';
-                case 'halogen':
-                    return 'category-halogen';
-                case 'noble gas':
-                    return 'category-noble-gas';
-                case 'lanthanide':
-                    return 'category-lanthanide';
-                case 'actinide':
-                    return 'category-actinide';
-                default:
-                    return '';
-            }
+        function getCategoryClass(kelompok) {
+            if (kelompok === '1') return 'category-alkali';
+            if (kelompok === '2') return 'category-alkaline-earth';
+            if (kelompok >= '3' && kelompok <= '12') return 'category-transition';
+            if (kelompok === '13' || kelompok === '14') return 'category-metalloid';
+            if (kelompok >= '15' && kelompok <= '16') return 'category-nonmetal';
+            if (kelompok === '17') return 'category-halogen';
+            if (kelompok === '18') return 'category-noble-gas';
+            return '';
         }
 
         function showDetails(element) {
@@ -132,7 +112,7 @@
             tableContainer.innerHTML = '';
             filteredElements.forEach(element => {
                 const div = document.createElement('div');
-                div.className = `element ${getCategoryClass(element.Kategori || '')}`;
+                div.className = `element ${getCategoryClass(element.Kelompok)}`;
                 div.textContent = element.Simbol;
                 div.onclick = () => showDetails(element);
                 tableContainer.appendChild(div);
