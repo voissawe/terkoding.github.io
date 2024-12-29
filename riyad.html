@@ -1,4 +1,209 @@
-{ number: 117, symbol: "Ts", name: "Tennessine", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360736" },
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Periodik Interaktif</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .table {
+            display: grid;
+            grid-template-columns: repeat(18, 50px);
+            grid-gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .element {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.2s;
+            color: #fff;
+        }
+        .element:hover {
+            transform: scale(1.1);
+        }
+        .element .symbol {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .element .number {
+            font-size: 12px;
+        }
+        .element .name {
+            font-size: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+        }
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tabel Periodik Interaktif</h1>
+    <div class="table" id="periodicTable">
+        <!-- Elemen akan dimuat di sini secara dinamis -->
+    </div>
+
+    <div class="modal" id="elementModal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="elementName"></h2>
+            <p><strong>Simbol:</strong> <span id="elementSymbol"></span></p>
+            <p><strong>Nomor Atom:</strong> <span id="elementNumber"></span></p>
+            <p><strong>Deskripsi:</strong> <span id="elementDescription"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const elements = [
+            { number: 1, symbol: "H", name: "Hidrogen", description: "Unsur paling ringan dan paling melimpah di alam semesta.", color: "#FFB5E8", cid: "783" },
+            { number: 2, symbol: "He", name: "Helium", description: "Gas mulia yang tidak mudah bereaksi, sering digunakan dalam balon udara.", color: "#B28DFF", cid: "23987" },
+            { number: 3, symbol: "Li", name: "Litium", description: "Logam alkali ringan yang digunakan dalam baterai.", color: "#FFABAB", cid: "3028194" },
+            { number: 4, symbol: "Be", name: "Berilium", description: "Logam ringan yang digunakan dalam pembuatan pesawat terbang dan roket.", color: "#FFC3A0", cid: "5460467" },
+            { number: 5, symbol: "B", name: "Bor", description: "Metaloid yang digunakan dalam pembuatan kaca tahan panas.", color: "#FFDAA5", cid: "5462311" },
+            { number: 6, symbol: "C", name: "Karbon", description: "Unsur penting dalam kehidupan organik.", color: "#D4A5A5", cid: "5462312" },
+            { number: 7, symbol: "N", name: "Nitrogen", description: "Gas yang menyusun 78% atmosfer Bumi.", color: "#B9FBC0", cid: "947" },
+            { number: 8, symbol: "O", name: "Oksigen", description: "Gas penting untuk respirasi makhluk hidup.", color: "#85E3FF", cid: "977" },
+            { number: 9, symbol: "F", name: "Fluorin", description: "Unsur reaktif yang digunakan dalam pasta gigi untuk mencegah gigi berlubang.", color: "#A0C4FF", cid: "16984" },
+            { number: 10, symbol: "Ne", name: "Neon", description: "Gas mulia yang digunakan dalam lampu neon.", color: "#BDB2FF", cid: "23935" },
+            { number: 11, symbol: "Na", name: "Natrium", description: "Logam alkali yang sangat reaktif, ditemukan dalam garam meja.", color: "#FFC6FF", cid: "5360545" },
+            { number: 12, symbol: "Mg", name: "Magnesium", description: "Logam ringan yang digunakan dalam kembang api dan pembuatan paduan logam.", color: "#FFADAD", cid: "5462224" },
+            { number: 13, symbol: "Al", name: "Aluminium", description: "Logam ringan yang digunakan dalam berbagai aplikasi, dari kaleng minuman hingga pesawat terbang.", color: "#FFD6A5", cid: "5359268" },
+            { number: 14, symbol: "Si", name: "Silikon", description: "Metaloid yang digunakan dalam pembuatan chip komputer dan kaca.", color: "#FDFFB6", cid: "5461123" },
+            { number: 15, symbol: "P", name: "Fosfor", description: "Unsur penting dalam DNA dan tulang.", color: "#CAFFBF", cid: "5462309" },
+            { number: 16, symbol: "S", name: "Belerang", description: "Unsur non-logam yang digunakan dalam pembuatan asam sulfat.", color: "#9BF6FF", cid: "5362487" },
+            { number: 17, symbol: "Cl", name: "Klorin", description: "Gas kuning-hijau yang digunakan dalam desinfeksi air.", color: "#A0C4FF", cid: "5360167" },
+            { number: 18, symbol: "Ar", name: "Argon", description: "Gas mulia yang tidak reaktif, digunakan dalam bola lampu.", color: "#BDB2FF", cid: "23968" },
+            { number: 19, symbol: "K", name: "Kalium", description: "Logam alkali yang sangat reaktif, digunakan dalam pupuk.", color: "#FFB5E8", cid: "5360351" },
+            { number: 20, symbol: "Ca", name: "Kalsium", description: "Logam alkali tanah yang penting untuk tulang dan gigi.", color: "#B28DFF", cid: "5362486" },
+            { number: 21, symbol: "Sc", name: "Skandium", description: "Logam transisi yang digunakan dalam paduan aluminium.", color: "#FFABAB", cid: "5361867" },
+            { number: 22, symbol: "Ti", name: "Titantum", description: "Logam kuat dan ringan, digunakan dalam pesawat terbang dan peralatan medis.", color: "#FFC3A0", cid: "5361941" },
+            { number: 23, symbol: "V", name: "Vanadium", description: "Logam transisi yang digunakan dalam pembuatan baja.", color: "#FFDAA5", cid: "5360380" },
+            { number: 24, symbol: "Cr", name: "Krom", description: "Logam transisi yang digunakan dalam pembuatan stainless steel.", color: "#FFDAA5", cid: "5360196" },
+            { number: 25, symbol: "Mn", name: "Mangan", description: "Logam transisi yang digunakan dalam pembuatan baterai dan paduan baja.", color: "#FFABAB", cid: "5360899" },
+            { number: 26, symbol: "Fe", name: "Besi", description: "Logam yang paling banyak digunakan dalam industri, terutama untuk pembuatan baja.", color: "#D4A5A5", cid: "5360664" },
+            { number: 27, symbol: "Co", name: "Kobalt", description: "Logam transisi yang digunakan dalam baterai dan magnet.", color: "#FFC3A0", cid: "5360534" },
+            { number: 28, symbol: "Ni", name: "Nikel", description: "Logam transisi yang digunakan dalam koin dan paduan logam.", color: "#D4A5A5", cid: "5360191" },
+            { number: 29, symbol: "Cu", name: "Tembaga", description: "Logam yang sangat baik dalam menghantarkan listrik dan panas.", color: "#FFDAA5", cid: "5360184" },
+            { number: 30, symbol: "Zn", name: "Seng", description: "Logam yang digunakan dalam pelapisan logam dan pembuatan baterai.", color: "#FFB5E8", cid: "5361033" },
+            { number: 31, symbol: "Ga", name: "Galium", description: "Logam yang lunak dan digunakan dalam pembuatan semikonduktor.", color: "#FFDAA5", cid: "5360902" },
+            { number: 32, symbol: "Ge", name: "Germanium", description: "Metaloid yang digunakan dalam teknologi semikonduktor.", color: "#D4A5A5", cid: "5361965" },
+            { number: 33, symbol: "As", name: "Arsen", description: "Semimetal beracun yang digunakan dalam pembuatan semikonduktor.", color: "#B9FBC0", cid: "5360154" },
+            { number: 34, symbol: "Se", name: "Selenium", description: "Non-logam yang digunakan dalam pembuatan panel surya.", color: "#B9FBC0", cid: "5360098" },
+            { number: 35, symbol: "Br", name: "Bromin", description: "Gas berwarna merah kecoklatan yang digunakan dalam pembuatan bahan kimia.", color: "#A0C4FF", cid: "5360707" },
+            { number: 36, symbol: "Kr", name: "Krypton", description: "Gas mulia yang digunakan dalam lampu neon dan lampu sorot.", color: "#BDB2FF", cid: "5360755" },
+            { number: 37, symbol: "Rb", name: "Rubidium", description: "Logam alkali yang digunakan dalam penelitian fisika.", color: "#FFB5E8", cid: "5360466" },
+            { number: 38, symbol: "Sr", name: "Stronsium", description: "Logam alkali tanah yang digunakan dalam pembuatan kembang api.", color: "#B28DFF", cid: "5360849" },
+            { number: 39, symbol: "Y", name: "Yttrium", description: "Logam transisi yang digunakan dalam pembuatan laser dan semikonduktor.", color: "#FFABAB", cid: "5360537" },
+            { number: 40, symbol: "Zr", name: "Zirkonium", description: "Logam tahan korosi yang digunakan dalam reaktor nuklir.", color: "#FFC3A0", cid: "5360772" },
+            { number: 41, symbol: "Nb", name: "Niohium", description: "Logam yang digunakan dalam superkonduktor.", color: "#FFDAA5", cid: "5360764" },
+            { number: 42, symbol: "Mo", name: "Molibdenum", description: "Logam transisi yang digunakan dalam pembuatan baja tahan karat.", color: "#FFDAA5", cid: "5360759" },
+            { number: 43, symbol: "Tc", name: "Teknetium", description: "Unsur buatan pertama yang digunakan dalam kedokteran nuklir.", color: "#FFABAB", cid: "5361019" },
+            { number: 44, symbol: "Ru", name: "Ruthenium", description: "Logam transisi yang digunakan dalam industri elektronik.", color: "#FFABAB", cid: "5360751" },
+            { number: 45, symbol: "Rh", name: "Rhodium", description: "Logam yang digunakan dalam katalisator untuk kendaraan bermotor.", color: "#FFDAA5", cid: "5360776" },
+            { number: 46, symbol: "Pd", name: "Palladium", description: "Logam yang digunakan dalam industri otomotif dan elektronik.", color: "#FFABAB", cid: "5360538" },
+            { number: 47, symbol: "Ag", name: "Perak", description: "Logam yang sangat baik dalam menghantarkan listrik dan panas.", color: "#D4A5A5", cid: "5360187" },
+            { number: 48, symbol: "Cd", name: "Kadmium", description: "Logam berat yang digunakan dalam baterai dan pelapisan logam.", color: "#FFB5E8", cid: "5360843" },
+            { number: 49, symbol: "In", name: "Indium", description: "Logam lunak yang digunakan dalam pembuatan semikonduktor.", color: "#FFDAA5", cid: "5360750" },
+            { number: 50, symbol: "Sn", name: "Timah", description: "Logam yang digunakan dalam pelapisan logam dan pembuatan kaleng.", color: "#D4A5A5", cid: "5360754" },
+            { number: 51, symbol: "Sb", name: "Antimon", description: "Semimetal yang digunakan dalam pembuatan paduan logam.", color: "#FFABAB", cid: "5360530" },
+            { number: 52, symbol: "I", name: "Iodium", description: "Halogen yang digunakan dalam pembuatan antiseptik.", color: "#A0C4FF", cid: "5360189" },
+            { number: 53, symbol: "Xe", name: "Xenon", description: "Gas mulia yang digunakan dalam lampu sorot dan laser.", color: "#BDB2FF", cid: "5360752" },
+            { number: 54, symbol: "Cs", name: "Sesium", description: "Logam alkali yang digunakan dalam jam atom.", color: "#FFB5E8", cid: "5360501" },
+            { number: 55, symbol: "Ba", name: "Barium", description: "Logam alkali tanah yang digunakan dalam pencahayaan dan alat deteksi.", color: "#B28DFF", cid: "5360739" },
+            { number: 56, symbol: "La", name: "Lantanum", description: "Logam tanah jarang yang digunakan dalam katalis.", color: "#FFABAB", cid: "5360531" },
+            { number: 57, symbol: "Ce", name: "Serium", description: "Logam tanah jarang yang digunakan dalam pembuatan kaca.", color: "#FFDAA5", cid: "5360823" },
+            { number: 58, symbol: "Pr", name: "Praseodimium", description: "Logam tanah jarang yang digunakan dalam magnet.", color: "#FFABAB", cid: "5360513" },
+            { number: 59, symbol: "Nd", name: "Neodimium", description: "Logam tanah jarang yang digunakan dalam magnet permanen kuat.", color: "#FFDAA5", cid: "5360559" },
+            { number: 60, symbol: "Pm", name: "Prometium", description: "Logam tanah jarang yang radioaktif dan digunakan dalam sumber energi.", color: "#FFABAB", cid: "5360165" },
+            { number: 61, symbol: "Sm", name: "Samarium", description: "Logam tanah jarang yang digunakan dalam magnet dan sumber energi.", color: "#FFDAA5", cid: "5360512" },
+            { number: 62, symbol: "Eu", name: "Eurium", description: "Logam tanah jarang yang digunakan dalam pembuatan lampu neon.", color: "#FFABAB", cid: "5360757" },
+            { number: 63, symbol: "Gd", name: "Gadolin", description: "Logam tanah jarang yang digunakan dalam teknologi sinar-X.", color: "#FFDAA5", cid: "5360753" },
+            { number: 64, symbol: "Tb", name: "Terbium", description: "Logam tanah jarang yang digunakan dalam pembuatan lampu fluorescent.", color: "#FFABAB", cid: "5360532" },
+            { number: 65, symbol: "Dy", name: "Dysprosium", description: "Logam tanah jarang yang digunakan dalam teknologi magnet.", color: "#FFDAA5", cid: "5360727" },
+            { number: 66, symbol: "Ho", name: "Holmium", description: "Logam tanah jarang yang digunakan dalam sinar-X dan laser.", color: "#FFABAB", cid: "5360543" },
+            { number: 67, symbol: "Er", name: "Erbium", description: "Logam tanah jarang yang digunakan dalam pembuatan serat optik.", color: "#FFDAA5", cid: "5360903" },
+            { number: 68, symbol: "Tm", name: "Thulium", description: "Logam tanah jarang yang digunakan dalam pembuatan alat medis.", color: "#FFABAB", cid: "5360890" },
+            { number: 69, symbol: "Yb", name: "Ytterbium", description: "Logam tanah jarang yang digunakan dalam laser dan alat ukur.", color: "#FFDAA5", cid: "5360906" },
+            { number: 70, symbol: "Lu", name: "Lutetium", description: "Logam tanah jarang yang digunakan dalam terapi kanker.", color: "#FFABAB", cid: "5360887" },
+            { number: 71, symbol: "Hf", name: "Hafnium", description: "Logam transisi yang digunakan dalam teknologi nuklir.", color: "#FFDAA5", cid: "5360724" },
+            { number: 72, symbol: "Ta", name: "Tantalum", description: "Logam transisi yang tahan korosi dan digunakan dalam teknologi elektronik.", color: "#FFABAB", cid: "5361002" },
+            { number: 73, symbol: "W", name: "Wolfram", description: "Logam transisi yang digunakan dalam filamen lampu dan peralatan elektronik.", color: "#FFDAA5", cid: "5360185" },
+            { number: 74, symbol: "Re", name: "Rhenium", description: "Logam transisi yang digunakan dalam mesin jet dan pembuatan superkonduktor.", color: "#FFABAB", cid: "5360728" },
+            { number: 75, symbol: "Os", name: "Osmium", description: "Logam transisi yang sangat padat dan digunakan dalam alat medis.", color: "#FFABAB", cid: "5360730" },
+            { number: 76, symbol: "Ir", name: "Iridium", description: "Logam transisi yang tahan korosi dan digunakan dalam komponen elektronik.", color: "#FFABAB", cid: "5360725" },
+            { number: 77, symbol: "Pt", name: "Platina", description: "Logam mulia yang digunakan dalam katalisator dan perhiasan.", color: "#FFABAB", cid: "5360242" },
+            { number: 78, symbol: "Au", name: "Emas", description: "Logam mulia yang digunakan dalam perhiasan dan penyimpanan nilai.", color: "#FFD700", cid: "5360181" },
+            { number: 79, symbol: "Hg", name: "Air Raksa", description: "Logam cair yang digunakan dalam termometer dan peralatan medis.", color: "#C0C0C0", cid: "5360387" },
+            { number: 80, symbol: "Pb", name: "Timbal", description: "Logam berat yang digunakan dalam pelapisan dan penyimpanan energi.", color: "#808080", cid: "5360734" },
+            { number: 81, symbol: "Bi", name: "Bismuth", description: "Logam berat yang digunakan dalam pembuatan paduan logam.", color: "#D4A5A5", cid: "5360789" },
+            { number: 82, symbol: "Po", name: "Polonium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360271" },
+            { number: 83, symbol: "At", name: "Astatin", description: "Unsur radioaktif yang digunakan dalam terapi kanker.", color: "#A0C4FF", cid: "5360753" },
+            { number: 84, symbol: "Rn", name: "Radon", description: "Gas radioaktif yang ditemukan di bumi.", color: "#BDB2FF", cid: "5360744" },
+            { number: 85, symbol: "Fr", name: "Francium", description: "Unsur radioaktif yang sangat langka.", color: "#FFB5E8", cid: "5360832" },
+            { number: 86, symbol: "Ra", name: "Radium", description: "Unsur radioaktif yang digunakan dalam aplikasi medis.", color: "#B28DFF", cid: "5360145" },
+            { number: 87, symbol: "Ac", name: "Aktinium", description: "Unsur radioaktif yang digunakan dalam reaktor nuklir.", color: "#FFABAB", cid: "5360605" },
+            { number: 88, symbol: "Th", name: "Torium", description: "Unsur radioaktif yang digunakan dalam pembangkit listrik nuklir.", color: "#FFDAA5", cid: "5360652" },
+            { number: 89, symbol: "Pa", name: "Protaktinium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFABAB", cid: "5360177" },
+            { number: 90, symbol: "U", name: "Uranium", description: "Unsur radioaktif yang digunakan dalam pembangkit listrik nuklir.", color: "#FFDAA5", cid: "5360388" },
+            { number: 91, symbol: "Np", name: "Neptunium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFABAB", cid: "5360528" },
+            { number: 92, symbol: "Pu", name: "Plutonium", description: "Unsur radioaktif yang digunakan dalam senjata nuklir.", color: "#FFDAA5", cid: "5360192" },
+            { number: 93, symbol: "Am", name: "Americium", description: "Unsur radioaktif yang digunakan dalam detektor asap.", color: "#FFABAB", cid: "5360731" },
+            { number: 94, symbol: "Cm", name: "Curium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360299" },
+            { number: 95, symbol: "Bk", name: "Berkelium", description: "Unsur radioaktif yang digunakan dalam pembuatan unsur-unsur lebih berat.", color: "#FFABAB", cid: "5360722" },
+            { number: 96, symbol: "Cf", name: "Kalifornium", description: "Unsur radioaktif yang digunakan dalam detektor neutron.", color: "#FFDAA5", cid: "5360525" },
+            { number: 97, symbol: "Es", name: "Einsteinium", description: "Unsur radioaktif yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360733" },
+            { number: 98, symbol: "Fm", name: "Fermium", description: "Unsur radioaktif yang digunakan dalam penelitian fisika nuklir.", color: "#FFDAA5", cid: "5360873" },
+            { number: 99, symbol: "Md", name: "Mendelevium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFABAB", cid: "5360749" },
+            { number: 100, symbol: "No", name: "Nobelium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360729" },
+            { number: 101, symbol: "Lr", name: "Lawrencium", description: "Unsur radioaktif yang digunakan dalam penelitian nuklir.", color: "#FFABAB", cid: "5360616" },
+            { number: 102, symbol: "Rf", name: "Rutherfordium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFDAA5", cid: "5360786" },
+            { number: 103, symbol: "Db", name: "Dubnium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360735" },
+            { number: 104, symbol: "Sg", name: "Seaborgium", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360639" },
+            { number: 105, symbol: "Bh", name: "Bohrium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360872" },
+            { number: 106, symbol: "Hs", name: "Hassium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFDAA5", cid: "5360737" },
+            { number: 107, symbol: "Mt", name: "Meitnerium", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFABAB", cid: "5360762" },
+            { number: 108, symbol: "Ds", name: "Darmstadtium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFDAA5", cid: "5360720" },
+            { number: 109, symbol: "Rg", name: "Roentgenium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360738" },
+            { number: 110, symbol: "Cn", name: "Copernicium", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360874" },
+            { number: 111, symbol: "Nh", name: "Nihonium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360617" },
+            { number: 112, symbol: "Fl", name: "Flerovium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFDAA5", cid: "5360765" },
+            { number: 113, symbol: "Mc", name: "Moscovium", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360763" },
+            { number: 114, symbol: "Lv", name: "Livermorium", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360638" },
+            { number: 115, symbol: "Ts", name: "Tennessine", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360736" },
+            { number: 116, symbol: "Og", name: "Oganesson", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360637" }
+            { number: 117, symbol: "Ts", name: "Tennessine", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360736" },
             { number: 118, symbol: "Og", name: "Oganesson", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360637" }
         ];
 
