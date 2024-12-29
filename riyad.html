@@ -19,10 +19,37 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
-            background-color: #f4f4f4;
+            color: white;
         }
         .element:hover {
-            background-color: #ddd;
+            opacity: 0.8;
+        }
+        .category-alkali {
+            background-color: #ff9999;
+        }
+        .category-alkaline-earth {
+            background-color: #ffcc99;
+        }
+        .category-transition {
+            background-color: #ffcc66;
+        }
+        .category-metalloid {
+            background-color: #ccff99;
+        }
+        .category-nonmetal {
+            background-color: #99ccff;
+        }
+        .category-halogen {
+            background-color: #99ccff;
+        }
+        .category-noble-gas {
+            background-color: #ccccff;
+        }
+        .category-lanthanide {
+            background-color: #ffccff;
+        }
+        .category-actinide {
+            background-color: #ff99cc;
         }
         .details {
             margin-top: 20px;
@@ -65,6 +92,31 @@
         const detailsContainer = document.getElementById('details');
         const searchInput = document.getElementById('search');
 
+        function getCategoryClass(category) {
+            switch (category.toLowerCase()) {
+                case 'alkali':
+                    return 'category-alkali';
+                case 'alkaline earth':
+                    return 'category-alkaline-earth';
+                case 'transition':
+                    return 'category-transition';
+                case 'metalloid':
+                    return 'category-metalloid';
+                case 'nonmetal':
+                    return 'category-nonmetal';
+                case 'halogen':
+                    return 'category-halogen';
+                case 'noble gas':
+                    return 'category-noble-gas';
+                case 'lanthanide':
+                    return 'category-lanthanide';
+                case 'actinide':
+                    return 'category-actinide';
+                default:
+                    return '';
+            }
+        }
+
         function showDetails(element) {
             detailsContainer.innerHTML = `
                 <h2>${element.Nama} (${element.Simbol})</h2>
@@ -80,7 +132,7 @@
             tableContainer.innerHTML = '';
             filteredElements.forEach(element => {
                 const div = document.createElement('div');
-                div.className = 'element';
+                div.className = `element ${getCategoryClass(element.Kategori || '')}`;
                 div.textContent = element.Simbol;
                 div.onclick = () => showDetails(element);
                 tableContainer.appendChild(div);
