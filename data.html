@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Periodic Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .table-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 5px;
+        }
+        .element {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: black; /* Teks hitam */
+        }
+        .element:hover {
+            opacity: 0.8;
+        }
+        .category-alkali {
+            background-color: #ff9999;
+        }
+        .category-alkaline-earth {
+            background-color: #ffcc99;
+        }
+        .category-transition {
+            background-color: #ffcc66;
+        }
+        .category-metalloid {
+            background-color: #ccff99;
+        }
+        .category-nonmetal {
+            background-color: #99ccff;
+        }
+        .category-halogen {
+            background-color: #66b3ff;
+        }
+        .category-noble-gas {
+            background-color: #ccccff;
+        }
+        /* Modal container */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Background transparan */
+        }
+        /* Modal content */
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        /* Close button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+        .share-options {
+            margin-top: 15px;
+        }
+        .share-options button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Interactive Periodic Table</h1>
+<input type="text" id="search" placeholder="Search element..." style="width: 100%; padding: 10px; margin-bottom: 20px;">
+
+<div class="table-container" id="periodic-table"></div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-modal">&times;</span>
+        <div id="modal-details"></div>
+        <div class="share-options">
+            <button id="share-facebook">Share to Facebook</button>
+            <button id="share-twitter">Share to Twitter</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchElements() {
+        const response = await fetch('bchem.csv'); // Assuming the CSV file is in the same directory
+        const csvText = await response.text();
+        const rows = csvText.split('\n');
+        const headers = rows.shift().split(',');
+        return rows.filter(row => row).map(row => {
+            const values = row.split(',');
+            const element = {};
+            headers.forEach((header, index) => {
+                element[header.trim()] = values[index]?.trim() || '';
+            });
+            return element;
+        });
+    }
+
+    async function renderTable() {
+        const elements = await fetchElements();
+        const tableContainer = document.getElementById('periodic-table');
+        const modal = document.getElementById('modal');
+        const modalDetails = document.getElementById('modal-details');
+        const closeModal = document.getElementById('close-modal');
+        const searchInput = document.getElementById('search');
+        const shareFacebook = document.getElementById('share-facebook');
+        const shareTwitter = document.getElementById('share-twitter');
+
+        let currentElement = null;
+
+        function getCategoryClass(kelompok) {
+            if (kelompok === '1') return 'category-alkali';
+            if (kelompok === '2') return 'category-alkaline-earth';
+            if (kelompok >= '3' && kelompok <= '12') return 'category-transition';
+            if (kelompok === '13' || kelompok === '14') return 'category-metalloid';
+            if (kelompok >= '15' && kelompok <= '16') return 'category-nonmetal';
+            if (kelompok === '17') return 'category-halogen';
+            if (kelompok === '18') return 'category-noble-gas';
+            return '';
+        }
+
+        function showModal(element) {
+            currentElement = element;
+            modalDetails.innerHTML = `
+                <h2>${element.Nama} (${element.Simbol})</h2>
+                <p><strong>Nomor Atom:</strong> ${element['Nomor Atom']}</p>
+                <p><strong>Massa Atom:</strong> ${element['Massa Atom']}</p>
+                <p><strong>Kelompok:</strong> ${element.Kelompok}</p>
+                <p><strong>Periode:</strong> ${element.Periode}</p>
+                <p><strong>CID:</strong> ${element.CID}</p>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function hideModal() {
+            modal.style.display = 'none';
+        }
+
+        function updateTable(filteredElements) {
+            tableContainer.innerHTML = '';
+            filteredElements.forEach(element => {
+                const div = document.createElement('div');
+                div.className = `element ${getCategoryClass(element.Kelompok)}`;
+                div.textContent = element.Simbol;
+                div.onclick = () => showModal(element);
+                tableContainer.appendChild(div);
+            });
+        }
+
+        function share(platform) {
+            const text = `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`;
+            if (platform === 'facebook') {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(text)}`, '_blank');
+            } else if (platform === 'twitter') {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const filteredElements = elements.filter(element =>
+                element.Nama.toLowerCase().includes(query) ||
+                element.Simbol.toLowerCase().includes(query)
+            );
+            updateTable(filteredElements);
+        });
+
+        closeModal.addEventListener('click', hideModal);
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) hideModal();
+        });
+
+        shareFacebook.addEventListener('click', () => share('facebook'));
+        shareTwitter.addEventListener('click', () => share('twitter'));
+
+        updateTable(elements);
+    }
+
+    renderTable();
+</script>
+
+</body>
+</html>
