@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Periodic Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .table {
+            display: grid;
+            grid-template-columns: repeat(18, 50px);
+            grid-gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .element {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+        .element:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.1);
+        }
+        .element .symbol {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .element .number {
+            font-size: 12px;
+        }
+        .element .name {
+            font-size: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+        }
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Periodic Table</h1>
+    <div class="table" id="periodicTable">
+        <!-- Elements will be inserted here dynamically -->
+    </div>
+
+    <div class="modal" id="elementModal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="elementName"></h2>
+            <p><strong>Symbol:</strong> <span id="elementSymbol"></span></p>
+            <p><strong>Atomic Number:</strong> <span id="elementNumber"></span></p>
+            <p><strong>Description:</strong> <span id="elementDescription"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const elements = [
+            { number: 1, symbol: "H", name: "Hydrogen", description: "The lightest element in the periodic table." },
+            { number: 2, symbol: "He", name: "Helium", description: "A noble gas used in balloons." },
+            // Add more elements here...
+        ];
+
+        const periodicTable = document.getElementById('periodicTable');
+        const elementModal = document.getElementById('elementModal');
+        const closeModal = document.getElementById('closeModal');
+        const elementName = document.getElementById('elementName');
+        const elementSymbol = document.getElementById('elementSymbol');
+        const elementNumber = document.getElementById('elementNumber');
+        const elementDescription = document.getElementById('elementDescription');
+
+        elements.forEach(element => {
+            const elementDiv = document.createElement('div');
+            elementDiv.classList.add('element');
+            elementDiv.innerHTML = `
+                <div class="number">${element.number}</div>
+                <div class="symbol">${element.symbol}</div>
+                <div class="name">${element.name}</div>
+            `;
+            elementDiv.addEventListener('click', () => {
+                elementName.textContent = element.name;
+                elementSymbol.textContent = element.symbol;
+                elementNumber.textContent = element.number;
+                elementDescription.textContent = element.description;
+                elementModal.style.display = 'flex';
+            });
+            periodicTable.appendChild(elementDiv);
+        });
+
+        closeModal.addEventListener('click', () => {
+            elementModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === elementModal) {
+                elementModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
