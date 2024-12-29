@@ -9,131 +9,107 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .table {
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .table-container {
             display: grid;
             grid-template-columns: repeat(18, 50px);
-            grid-gap: 5px;
-            justify-content: center;
-            margin: 20px auto;
+            gap: 5px;
+            margin: 20px;
         }
+
         .element {
-            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             padding: 10px;
             text-align: center;
             cursor: pointer;
-            border-radius: 5px;
             transition: transform 0.2s;
-            color: #fff;
         }
+
         .element:hover {
             transform: scale(1.1);
+            background-color: #e0e0e0;
         }
-        .element .symbol {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .element .number {
+
+        .element span {
             font-size: 12px;
         }
-        .element .name {
-            font-size: 10px;
-        }
-        .modal {
+
+        #info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            text-align: left;
-        }
-        .modal-content h2 {
-            margin-top: 0;
-        }
-        .close {
-            float: right;
-            font-size: 20px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Tabel Periodik Interaktif</h1>
-    <div class="table" id="periodicTable">
-        <!-- Elemen akan dimuat di sini secara dinamis -->
-    </div>
-
-    <div class="modal" id="elementModal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2 id="elementName"></h2>
-            <p><strong>Simbol:</strong> <span id="elementSymbol"></span></p>
-            <p><strong>Nomor Atom:</strong> <span id="elementNumber"></span></p>
-            <p><strong>Deskripsi:</strong> <span id="elementDescription"></span></p>
-        </div>
+    <div class="table-container" id="table"></div>
+    <div id="info">
+        <h2 id="element-name">Nama Unsur</h2>
+        <p><strong>Simbol:</strong> <span id="element-symbol"></span></p>
+        <p><strong>Nomor Atom:</strong> <span id="element-number"></span></p>
+        <p><strong>Detail:</strong> <span id="element-details"></span></p>
     </div>
 
     <script>
-        const elements = [
-            { number: 1, symbol: "H", name: "Hidrogen", description: "Unsur paling ringan dan paling melimpah di alam semesta.", color: "#FFB5E8", cid: "783" },
-            { number: 2, symbol: "He", name: "Helium", description: "Gas mulia yang tidak mudah bereaksi, sering digunakan dalam balon udara.", color: "#B28DFF", cid: "23987" },
-            { number: 3, symbol: "Li", name: "Litium", description: "Logam alkali ringan yang digunakan dalam baterai.", color: "#FFABAB", cid: "3028194" },
-            { number: 4, symbol: "Be", name: "Berilium", description: "Logam ringan yang digunakan dalam pembuatan pesawat terbang dan roket.", color: "#FFC3A0", cid: "5460467" },
-            { number: 5, symbol: "B", name: "Bor", description: "Metaloid yang digunakan dalam pembuatan kaca tahan panas.", color: "#FFDAA5", cid: "5462311" },
-            { number: 6, symbol: "C", name: "Karbon", description: "Unsur penting dalam kehidupan organik.", color: "#D4A5A5", cid: "5462312" },
-            { number: 7, symbol: "N", name: "Nitrogen", description: "Gas yang menyusun 78% atmosfer Bumi.", color: "#B9FBC0", cid: "947" },
-            { number: 8, symbol: "O", name: "Oksigen", description: "Gas penting untuk respirasi makhluk hidup.", color: "#85E3FF", cid: "977" },
-            { number: 9, symbol: "F", name: "Fluorin", description: "Unsur reaktif yang digunakan dalam pasta gigi untuk mencegah gigi berlubang.", color: "#A0C4FF", cid: "16984" },
-            { number: 10, symbol: "Ne", name: "Neon", description: "Gas mulia yang digunakan dalam lampu neon.", color: "#BDB2FF", cid: "23935" },
-            { number: 11, symbol: "Na", name: "Natrium", description: "Logam alkali yang sangat reaktif, ditemukan dalam garam meja.", color: "#FFC6FF", cid: "5360545" },
-            { number: 12, symbol: "Mg", name: "Magnesium", description: "Logam ringan yang digunakan dalam kembang api dan pembuatan paduan logam.", color: "#FFADAD", cid: "5462224" },
-            { number: 13, symbol: "Al", name: "Aluminium", description: "Logam ringan yang digunakan dalam berbagai aplikasi, dari kaleng minuman hingga pesawat terbang.", color: "#FFD6A5", cid: "5359268" },
-            { number: 14, symbol: "Si", name: "Silikon", description: "Metaloid yang digunakan dalam pembuatan chip komputer dan kaca.", color: "#FDFFB6", cid: "5461123" },
-            { number: 15, symbol: "P", name: "Fosfor", description: "Unsur penting dalam DNA dan tulang.", color: "#CAFFBF", cid: "5462309" },
-            { number: 16, symbol: "S", name: "Belerang", description: "Unsur non-logam yang digunakan dalam pembuatan asam sulfat.", color: "#9BF6FF", cid: "5362487" },
-            { number: 17, symbol: "Cl", name: "Klorin", description: "Gas kuning-hijau yang digunakan dalam desinfeksi air.", color: "#A0C4FF", cid: "5360167" },
-            { number: 18, symbol: "Ar", name: "Argon", description: "Gas mulia yang tidak reaktif, digunakan dalam bola lampu.", color: "#BDB2FF", cid: "23968" },
-            // Lanjutkan hingga nomor atom 118
-            { number: 117, symbol: "Ts", name: "Tennessine", description: "Unsur sintetik yang digunakan dalam penelitian fisika nuklir.", color: "#FFABAB", cid: "5360736" },
-            { number: 118, symbol: "Og", name: "Oganesson", description: "Unsur sintetik yang digunakan dalam penelitian nuklir.", color: "#FFDAA5", cid: "5360637" }
-        ];
+        const tableContainer = document.getElementById('table');
+        const info = document.getElementById('info');
+        const elementName = document.getElementById('element-name');
+        const elementSymbol = document.getElementById('element-symbol');
+        const elementNumber = document.getElementById('element-number');
+        const elementDetails = document.getElementById('element-details');
 
-        const table = document.getElementById("periodicTable");
+        // Fungsi untuk memuat data elemen dari PubChem
+        async function loadElements() {
+            for (let i = 1; i <= 118; i++) { // Nomor atom 1-118
+                try {
+                    const response = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/element/atomicnumber/${i}/JSON`);
+                    const data = await response.json();
 
-        elements.forEach(element => {
-            const div = document.createElement("div");
-            div.className = "element";
-            div.style.backgroundColor = element.color;
-            div.innerHTML = `
-                <div class="number">${element.number}</div>
-                <div class="symbol">${element.symbol}</div>
-                <div class="name">${element.name}</div>
-            `;
-            div.addEventListener("click", () => {
-                document.getElementById("elementName").innerText = element.name;
-                document.getElementById("elementSymbol").innerText = element.symbol;
-                document.getElementById("elementNumber").innerText = element.number;
-                document.getElementById("elementDescription").innerText = element.description;
-                document.getElementById("elementModal").style.display = "flex";
-            });
-            table.appendChild(div);
-        });
+                    const element = data.Table.Row[0];
+                    const elementDiv = document.createElement('div');
+                    elementDiv.className = 'element';
+                    elementDiv.innerHTML = `
+                        <strong>${element.Symbol}</strong>
+                        <span>${element.AtomicNumber}</span>
+                    `;
 
-        document.getElementById("closeModal").addEventListener("click", () => {
-            document.getElementById("elementModal").style.display = "none";
-        });
+                    elementDiv.addEventListener('click', () => {
+                        elementName.textContent = element.Name;
+                        elementSymbol.textContent = element.Symbol;
+                        elementNumber.textContent = element.AtomicNumber;
+                        elementDetails.textContent = `Massa Atom: ${element.AtomicMass} u`;
+                        info.style.display = 'block';
+                    });
+
+                    tableContainer.appendChild(elementDiv);
+                } catch (error) {
+                    console.error(`Gagal memuat data untuk nomor atom ${i}:`, error);
+                }
+            }
+        }
+
+        // Memulai pemuatan data
+        loadElements();
     </script>
 </body>
 </html>
