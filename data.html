@@ -104,7 +104,7 @@
         <span class="close" id="close-modal">&times;</span>
         <div id="modal-details"></div>
         <div class="share-options">
-            <button id="share-device">Share via Device</button>
+            <button id="share-device">Share via Social Media</button>
         </div>
     </div>
 </div>
@@ -149,7 +149,7 @@
 
         function showModal(element) {
             currentElement = element;
-            modalDetails.innerHTML = `
+            modalDetails.innerHTML = ` 
                 <h2>${element.Nama} (${element.Simbol})</h2>
                 <p><strong>Nomor Atom:</strong> ${element['Nomor Atom']}</p>
                 <p><strong>Massa Atom:</strong> ${element['Massa Atom']}</p>
@@ -164,20 +164,29 @@
             modal.style.display = 'none';
         }
 
+        // Social media share links
         function shareWithDevice() {
-            if (!navigator.share) {
-                alert('Sharing is not supported on this device.');
-                return;
-            }
+            const shareText = `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`;
+            const url = encodeURIComponent(`https://example.com?element=${currentElement.CID}`); // Replace with your actual URL
 
-            const shareData = {
-                title: `Element: ${currentElement.Nama} (${currentElement.Simbol})`,
-                text: `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`,
-            };
+            const whatsappURL = `https://wa.me/?text=${shareText}%0A${url}`;
+            const telegramURL = `https://t.me/share/url?url=${url}&text=${shareText}`;
+            const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            const instagramURL = `https://www.instagram.com/?url=${url}`;  // Instagram does not allow direct URL sharing via links, this is just an example.
+            const twitterURL = `https://twitter.com/intent/tweet?text=${shareText}%20${url}`;
 
-            navigator.share(shareData)
-                .then(() => console.log('Successfully shared'))
-                .catch((error) => console.error('Error sharing:', error));
+            const message = `Sharing is not supported directly. You can use the following links to share:\n\n` +
+                            `WhatsApp: ${whatsappURL}\n` +
+                            `Telegram: ${telegramURL}\n` +
+                            `Facebook: ${facebookURL}\n` +
+                            `Instagram: ${instagramURL}\n` +
+                            `Twitter (X): ${twitterURL}`;
+
+            // Show an alert with the sharing options
+            alert(message);
+
+            // Alternatively, you could open any of these URLs directly in a new window:
+            // window.open(whatsappURL);
         }
 
         function updateTable(filteredElements) {
