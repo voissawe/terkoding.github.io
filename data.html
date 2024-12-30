@@ -19,7 +19,7 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
-            color: black; /* Teks hitam */
+            color: black;
         }
         .element:hover {
             opacity: 0.8;
@@ -55,7 +55,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Background transparan */
+            background-color: rgba(0, 0, 0, 0.5);
         }
         /* Modal content */
         .modal-content {
@@ -149,7 +149,7 @@
 
         function showModal(element) {
             currentElement = element;
-            modalDetails.innerHTML = `
+            modalDetails.innerHTML = ` 
                 <h2>${element.Nama} (${element.Simbol})</h2>
                 <p><strong>Nomor Atom:</strong> ${element['Nomor Atom']}</p>
                 <p><strong>Massa Atom:</strong> ${element['Massa Atom']}</p>
@@ -165,19 +165,23 @@
         }
 
         function shareWithDevice() {
-            if (!navigator.share) {
-                alert('Sharing is not supported on this device.');
-                return;
+            if (navigator.share) {
+                const shareData = {
+                    title: `Element: ${currentElement.Nama} (${currentElement.Simbol})`,
+                    text: `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`,
+                };
+
+                navigator.share(shareData)
+                    .then(() => console.log('Successfully shared'))
+                    .catch((error) => console.error('Error sharing:', error));
+            } else {
+                // Fallback if the Web Share API is not supported
+                const shareText = `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`;
+                const url = encodeURIComponent(`https://example.com?element=${currentElement.CID}`); // Replace with your actual URL
+                const fallbackMessage = `Sharing is not supported directly. You can copy the following link: https://example.com?element=${currentElement.CID}`;
+
+                alert(fallbackMessage); // Simple fallback message
             }
-
-            const shareData = {
-                title: `Element: ${currentElement.Nama} (${currentElement.Simbol})`,
-                text: `Check out the element ${currentElement.Nama} (${currentElement.Simbol}) with Atomic Number ${currentElement['Nomor Atom']}!`,
-            };
-
-            navigator.share(shareData)
-                .then(() => console.log('Successfully shared'))
-                .catch((error) => console.error('Error sharing:', error));
         }
 
         function updateTable(filteredElements) {
